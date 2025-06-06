@@ -74,7 +74,7 @@ list-projects:
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
 	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
 	@echo "                 worm-sample interaction-sample mechano-sample rules-sample physimess-sample custom-division-sample"
-	@echo "                 asymmetric-division-sample immune-function-sample episode-sample"
+	@echo "                 asymmetric-division-sample extended-asym-div-sample immune-function-sample episode-sample"
 	@echo ""
 	@echo "Sample intracellular projects: template_BM ode-energy-sample physiboss-cell-lines-sample"
 	@echo "                 cancer-metabolism-sample physiboss-tutorial physiboss-tutorial-invasion"

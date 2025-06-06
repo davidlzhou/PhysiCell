@@ -1433,16 +1433,19 @@ void set_behaviors( Cell* pCell , std::vector<double> parameters )
 
 	// asymmetric division
 	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
-	std::copy(  parameters.begin()+first_asymmetric_division_index , 
-				parameters.begin()+first_asymmetric_division_index+n , 
-				pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.begin() );
+	for ( int i = 0; i < n ; i++ )
+	{
+		std::pair<int, int> coords = std::make_pair(pCell->type, i);
+		pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[coords] = parameters[i + first_asymmetric_division_index];
+	}
 
 	// DZ change for extended asym div
+	std::cout << "Warning: set_behaviors is overwriting values for standard asymmetric division with extended asymmetric division probabilities!" << std::endl;
 	static int first_extended_asymmetric_division_index = find_behavior_index( "extended asymmetric division to " + cell_definitions_by_type[0]->name + " and " + cell_definitions_by_type[0]->name );
 	for( int ind = 0; ind < (n + 1) * n / 2; ind++ )
 	{
 		std::pair<int, int> coords = extended_asym_index_to_upper_triangle(ind);
-		pCell->phenotype.cycle.extended_asymmetric_division.asymmetric_division_probabilities[coords] = parameters[ind + first_extended_asymmetric_division_index];
+		pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[coords] = parameters[ind + first_extended_asymmetric_division_index];
 	}
 
 	// custom behaviors
@@ -1670,12 +1673,12 @@ void set_single_behavior( Cell* pCell, int index , double parameter )
 	// asymmetric division
 	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
 	if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-	{ pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[index-first_asymmetric_division_index] = parameter; return; }
+	{ pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[std::make_pair(pCell->type, index-first_asymmetric_division_index)] = parameter; return; }
 
 	// DZ change for extended asym div
 	static int first_extended_asymmetric_division_index = find_behavior_index( "extended asymmetric division to " + cell_definitions_by_type[0]->name + " and " + cell_definitions_by_type[0]->name );
 	if( index >= first_extended_asymmetric_division_index && index < first_extended_asymmetric_division_index + n * (n + 1) / 2 )
-	{ pCell->phenotype.cycle.extended_asymmetric_division.asymmetric_division_probabilities[extended_asym_index_to_upper_triangle(index - first_extended_asymmetric_division_index)] = parameter; return; }
+	{ pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[extended_asym_index_to_upper_triangle(index - first_extended_asymmetric_division_index)] = parameter; return; }
 
 	// custom behavior
 	static int first_custom_ind = find_behavior_index( "custom 0"); 
@@ -1886,16 +1889,18 @@ std::vector<double> get_behaviors( Cell* pCell )
 
 	// asymmetric division
 	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
-	std::copy(  pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.begin(), 
-				pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.end(), 
-				parameters.begin()+first_asymmetric_division_index );
+	for ( int i = 0; i < n ; i++ )
+	{
+		std::pair<int, int> coords = std::make_pair(pCell->type, i);
+		parameters[i + first_asymmetric_division_index] = pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[coords];
+	}
 
 	// DZ change for extended asym div
 	static int first_extended_asymmetric_division_index = find_behavior_index( "extended asymmetric division to " + cell_definitions_by_type[0]->name + " and " + cell_definitions_by_type[0]->name );
 	for( int ind = 0; ind < (n + 1) * n / 2; ind++ )
 	{
 		std::pair<int, int> coords = extended_asym_index_to_upper_triangle(ind);
-		parameters[ind + first_extended_asymmetric_division_index] = pCell->phenotype.cycle.extended_asymmetric_division.asymmetric_division_probabilities[coords];
+		parameters[ind + first_extended_asymmetric_division_index] = pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[coords];
 	}
 
 	// custom behavior
@@ -2109,12 +2114,12 @@ double get_single_behavior( Cell* pCell , int index )
 	// asymmetric division
 	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
 	if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index+n )
-	{ return pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[index-first_asymmetric_division_index]; }
+	{ return pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[std::make_pair(pCell->type, index-first_asymmetric_division_index)]; }
 
 	// DZ change for extended asym div
 	static int first_extended_asymmetric_division_index = find_behavior_index( "extended asymmetric division to " + cell_definitions_by_type[0]->name + " and " + cell_definitions_by_type[0]->name );
 	if( index >= first_extended_asymmetric_division_index && index < first_extended_asymmetric_division_index + n * (n + 1) / 2 )
-	{ return pCell->phenotype.cycle.extended_asymmetric_division.asymmetric_division_probabilities[extended_asym_index_to_upper_triangle(index - first_extended_asymmetric_division_index)]; }
+	{ return pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[extended_asym_index_to_upper_triangle(index - first_extended_asymmetric_division_index)]; }
 
 	// custom behavior
 	static int first_custom_ind = find_behavior_index( "custom 0"); 
@@ -2355,16 +2360,18 @@ std::vector<double> get_base_behaviors( Cell* pCell )
 
 	// asymmetric division
 	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
-	std::copy(  pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.begin(), 
-				pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.end(), 
-				parameters.begin()+first_asymmetric_division_index );
+	for ( int i = 0; i < n ; i++ )
+	{
+		std::pair<int, int> coords = std::make_pair(pCD->type, i);
+		parameters[i + first_asymmetric_division_index] = pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[coords];
+	}
 
 	// DZ change for extended asym div
 	static int first_extended_asymmetric_division_index = find_behavior_index( "extended asymmetric division to " + cell_definitions_by_type[0]->name + " and " + cell_definitions_by_type[0]->name );
 	for( int ind = 0; ind < (n + 1) * n / 2; ind++ )
 	{
 		std::pair<int, int> coords = extended_asym_index_to_upper_triangle(ind);
-		parameters[ind + first_extended_asymmetric_division_index] = pCell->phenotype.cycle.extended_asymmetric_division.asymmetric_division_probabilities[coords];
+		parameters[ind + first_extended_asymmetric_division_index] = pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[coords];
 	}
 
 	// custom behavior
@@ -2581,12 +2588,12 @@ double get_single_base_behavior( Cell* pCell , int index )
 	// asymmetric division
 	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
 	if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-	{ return pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[index-first_asymmetric_division_index]; }
+	{ return pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[std::make_pair(pCell->type, index-first_asymmetric_division_index)]; }
 
 	// DZ change for extended asym div
 	static int first_extended_asymmetric_division_index = find_behavior_index( "extended asymmetric division to " + cell_definitions_by_type[0]->name + " and " + cell_definitions_by_type[0]->name );
 	if( index >= first_extended_asymmetric_division_index && index < first_extended_asymmetric_division_index + n * (n + 1) / 2 )
-	{ return pCD->phenotype.cycle.extended_asymmetric_division.asymmetric_division_probabilities[extended_asym_index_to_upper_triangle(index - first_extended_asymmetric_division_index)]; }
+	{ return pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[extended_asym_index_to_upper_triangle(index - first_extended_asymmetric_division_index)]; }
 
 	// custom behavior
 	static int first_custom_ind = find_behavior_index( "custom 0"); 
@@ -2808,12 +2815,12 @@ double get_single_base_behavior( Cell_Definition* pCD , int index )
 	// asymmetric division
 	static int first_asymmetric_division_index = find_behavior_index( "asymmetric division to " + cell_definitions_by_type[0]->name );
 	if( index >= first_asymmetric_division_index && index < first_asymmetric_division_index + n )
-	{ return pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[index-first_asymmetric_division_index]; }
+	{ return pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[std::make_pair(pCD->type, index-first_asymmetric_division_index)]; }
 
 	// DZ change for extended asym div
 	static int first_extended_asymmetric_division_index = find_behavior_index( "extended asymmetric division to " + cell_definitions_by_type[0]->name + " and " + cell_definitions_by_type[0]->name );
 	if( index >= first_extended_asymmetric_division_index && index < first_extended_asymmetric_division_index + n * (n + 1) / 2 )
-	{ return pCD->phenotype.cycle.extended_asymmetric_division.asymmetric_division_probabilities[extended_asym_index_to_upper_triangle(index - first_extended_asymmetric_division_index)]; }
+	{ return pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[extended_asym_index_to_upper_triangle(index - first_extended_asymmetric_division_index)]; }
 
 	// custom behavior
 	static int first_custom_ind = find_behavior_index( "custom 0"); 

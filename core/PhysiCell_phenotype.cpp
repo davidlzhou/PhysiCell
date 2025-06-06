@@ -1358,31 +1358,7 @@ double& Cell_Transformations::transformation_rate( std::string type_name )
 	return transformation_rates[n]; 
 }
 
-Asymmetric_Division::Asymmetric_Division()
-{
-	asymmetric_division_probabilities = {0.0};
-}
-
-void Asymmetric_Division::sync_to_cell_definitions()
-{
-	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-	int number_of_cell_defs = cell_definition_indices_by_name.size(); 
-	
-	if( asymmetric_division_probabilities.size() != number_of_cell_defs )
-	{ asymmetric_division_probabilities.resize( number_of_cell_defs, 0.0); }
-	
-	return; 
-}
-
 double Asymmetric_Division::probabilities_total( void )
-{
-	double total = 0.0; 
-	for( int i=0; i < asymmetric_division_probabilities.size(); i++ )
-	{ total += asymmetric_division_probabilities[i]; }
-	return total; 
-}
-
-double Extended_Asymmetric_Division::probabilities_total( void )
 {
 	double total = 0.0; 
 	for (const auto& pair : asymmetric_division_probabilities)
@@ -1390,16 +1366,8 @@ double Extended_Asymmetric_Division::probabilities_total( void )
 	return total; 
 }
 
-// ease of access
-double& Asymmetric_Division::asymmetric_division_probability( std::string type_name )
-{
-	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
-	int n = cell_definition_indices_by_name[type_name]; 
-	return asymmetric_division_probabilities[n]; 
-}
-
 // DZ change extended asym div
-double& Extended_Asymmetric_Division::asymmetric_division_probability( std::pair<std::string, std::string> type_names )
+double& Asymmetric_Division::asymmetric_division_probability( std::pair<std::string, std::string> type_names )
 {
 	extern std::unordered_map<std::string,int> cell_definition_indices_by_name; 
 	int n = cell_definition_indices_by_name[type_names.first]; 

@@ -173,7 +173,6 @@ Cell_Definition::Cell_Definition()
 	// 					are appropriately sized. Same on motiltiy. 
 	phenotype.cell_interactions.sync_to_cell_definitions(); 
 	phenotype.cell_transformations.sync_to_cell_definitions(); 
-	phenotype.cycle.asymmetric_division.sync_to_cell_definitions();
 	phenotype.motility.sync_to_current_microenvironment(); 
 	phenotype.mechanics.sync_to_cell_definitions(); 
 	
@@ -2073,8 +2072,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// transformation 
 			pCD->phenotype.cell_transformations.transformation_rates.assign(number_of_cell_defs,0.0); 
 
-			// asymmetric division
-			pCD->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.assign(number_of_cell_defs,0.0);
 		}
 		else 
 		{
@@ -2112,7 +2109,6 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	// this requires that prebuild_cell_definition_index_maps was already run 
 	pCD->phenotype.cell_interactions.sync_to_cell_definitions(); 
 	pCD->phenotype.cell_transformations.sync_to_cell_definitions(); 
-	pCD->phenotype.cycle.asymmetric_division.sync_to_cell_definitions();
 	pCD->phenotype.mechanics.sync_to_cell_definitions(); 
 	
 	// set the reference phenotype 
@@ -2290,7 +2286,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					int target_index = search->second;
 
 					double asymmetric_division_probability = xml_get_my_double_value(node_adp);
-					pAD->asymmetric_division_probabilities[target_index] = asymmetric_division_probability;
+					pAD->asymmetric_division_probabilities[std::make_pair(pCD->type, target_index)] = asymmetric_division_probability;
 				}
 				else
 				{
@@ -2301,13 +2297,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				}
 				node_adp = node_adp.next_sibling("asymmetric_division_probability");
 			}
-			std::cout << "Asymmetric division probabilities for " << pCD->name << ": ";
-			for (int i = 0; i < pAD->asymmetric_division_probabilities.size(); i++)
-			{
-				std::cout << pAD->asymmetric_division_probabilities[i] << " ";
-			}
-			std::cout << std::endl;
-			pCD->functions.cell_division_function = standard_asymmetric_division_function;
+			pCD->functions.cell_division_function = asymmetric_division_function;
 		}
 
 		node = cd_node.child( "phenotype" );
@@ -2315,7 +2305,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		node = node.child( "extended_asymmetric_division" );
 		if( node && node.attribute("enabled").as_bool() )
 		{
-			Extended_Asymmetric_Division *pEAD = &(pCD->phenotype.cycle.extended_asymmetric_division);
+			Asymmetric_Division *pAD = &(pCD->phenotype.cycle.asymmetric_division);
 
 			// asymmetric division rates
 			pugi::xml_node node_eadp = node.child( "extended_asymmetric_division_probability" );
@@ -2343,19 +2333,12 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				int second_target_index = second_search->second;
 
 				double extended_asymmetric_division_probability = xml_get_my_double_value(node_eadp);
-				pEAD->asymmetric_division_probabilities[std::make_pair(first_target_index, second_target_index)] = extended_asymmetric_division_probability;
+				pAD->asymmetric_division_probabilities[std::make_pair(first_target_index, second_target_index)] = extended_asymmetric_division_probability;
 
 				node_eadp = node_eadp.next_sibling("extended_asymmetric_division_probability");
 			}
-			/* Probably delete...
-			std::cout << "Extended asymmetric division probabilities for " << pCD->name << ": " << std::endl; // DZ delete?
-			for (auto it = pEAD->asymmetric_division_probabilities.begin(); it != pEAD->asymmetric_division_probabilities.end(); ++it)
-			{
-				std::cout << cell_definitions_by_index[it->first.first]->name << " and " << cell_definitions_by_index[it->first.first]->name << ": " << it->second << std::endl; // sometimes throws seg fault
-			}
-			*/
 			std::cout << std::endl;
-			pCD->functions.cell_division_function = extended_asymmetric_division_function;
+			pCD->functions.cell_division_function = asymmetric_division_function;
 		}
 
 	}
