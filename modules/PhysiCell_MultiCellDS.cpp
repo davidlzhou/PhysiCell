@@ -987,15 +987,8 @@ void add_PhysiCell_cells_to_open_xml_pugi_v2( pugi::xml_document& xml_dom, std::
 		{
 			for ( int i2 = i1; i2 < n; i2++ )
 			{
-				std::pair<int,int> coords = std::make_pair(i1,i2);
-				if ( pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.find(coords) == pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities.end() )
-				{
-					static const double ZERO_DOUBLE = 0.0;
-					std::fwrite(&ZERO_DOUBLE, sizeof(double), 1, fp); // crazy way to just write a zero
-				}
-				else {
-					std::fwrite( &( pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probabilities[coords] ) , sizeof(double) , 1 , fp );
-				}
+				double prob = pCell->phenotype.cycle.asymmetric_division.asymmetric_division_probability(i1, i2);
+				std::fwrite(&prob, sizeof(double), 1, fp);
 			}
 		}
 

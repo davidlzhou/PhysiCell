@@ -213,7 +213,7 @@ class Cycle_Model
 	std::ostream& display( std::ostream& os ); // done 
 };
 
-// DZ change extended asym div: needed a hash function for pairs of ints as keys for extended_asymmetric_division_probabilities.
+// A hash function for pairs of ints as keys for extended_asymmetric_division_probabilities.
 // Should follow upper-triangular variant of Cantor set to prevent collisions.
 struct pair_hash {
 	
@@ -236,13 +236,27 @@ struct equality_function {
 
 class Asymmetric_Division
 {
+	
 public:
-	std::unordered_map<std::pair<int, int>, double, pair_hash, equality_function> asymmetric_division_probabilities;	// DZ change extended asym div
+	std::unordered_map<std::pair<int, int>, double, pair_hash, equality_function> asymmetric_division_probabilities;
 
-	double probabilities_total(); // done
+	void set_asymmetric_division_probability(std::pair<int, int> types, double probability);
+	void set_asymmetric_division_probability(int upper_triangular_index, double probability);
+	void set_asymmetric_division_probability(int type_1, int type_2, double probability);
+	void set_asymmetric_division_probability(std::string type_name_1, std::string type_name_2, double probability);
 
-	double& asymmetric_division_probability( std::pair<std::string, std::string> type_names );
+	double asymmetric_division_probability(std::pair<int, int> types);
+	double asymmetric_division_probability(int upper_triangular_index);
+	double asymmetric_division_probability(int type_1, int type_2);
+	double asymmetric_division_probability(std::string type_name_1, std::string type_name_2);
+
+	double probabilities_total();
+
+	std::pair<int, int> select_daughter_types(int type_1, int type_2);
 };
+
+std::pair<int, int> extended_asym_index_to_upper_triangle(int index);
+std::vector<std::pair<int, int>> initialize_pairs_vector(void);
 
 class Cycle
 {
@@ -262,7 +276,7 @@ class Cycle
 	
 	void sync_to_cycle_model( Cycle_Model& cm ); // done 
 
-	Asymmetric_Division asymmetric_division; // DZ change extended asym div
+	Asymmetric_Division asymmetric_division;
 };
 
 class Death_Parameters

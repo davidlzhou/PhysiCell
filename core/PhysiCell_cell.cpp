@@ -2286,7 +2286,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 					int target_index = search->second;
 
 					double asymmetric_division_probability = xml_get_my_double_value(node_adp);
-					pAD->asymmetric_division_probabilities[std::make_pair(pCD->type, target_index)] = asymmetric_division_probability;
+					pAD->set_asymmetric_division_probability(pCD->type, target_index, asymmetric_division_probability);
 				}
 				else
 				{
@@ -2333,7 +2333,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 				int second_target_index = second_search->second;
 
 				double extended_asymmetric_division_probability = xml_get_my_double_value(node_eadp);
-				pAD->asymmetric_division_probabilities[std::make_pair(first_target_index, second_target_index)] = extended_asymmetric_division_probability;
+				pAD->set_asymmetric_division_probability(first_target_index, second_target_index, extended_asymmetric_division_probability);
 
 				node_eadp = node_eadp.next_sibling("extended_asymmetric_division_probability");
 			}
